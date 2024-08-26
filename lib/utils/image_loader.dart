@@ -33,6 +33,9 @@ class ImageLoader {
       ..addListener(
         ImageStreamListener((info, _) {
           print('Image loaded: ${info.image.width}x${info.image.height}');
+          if (completer.isCompleted) {
+            return;
+          }
           completer.complete(ImageData(
             image: image,
             width: info.image.width,
@@ -40,6 +43,9 @@ class ImageLoader {
           ));
         }, onError: (dynamic exception, StackTrace? stackTrace) {
           print('Image load failed: $exception');
+          if (completer.isCompleted) {
+            return;
+          }
           completer.completeError(exception, stackTrace);
         }),
       );

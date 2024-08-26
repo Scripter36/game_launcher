@@ -15,7 +15,7 @@ class GamePage extends StatefulHookConsumerWidget {
 class _GamePageState extends ConsumerState<GamePage> {
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<List<GameData>> games = ref.watch(getGameDataProvider);
+    final AsyncValue<List<GameData>> games = ref.watch(gameDataListProvider);
 
     // simple hack to make the page view infinite in both directions
     const int initialPage = 1073741823;
@@ -31,6 +31,9 @@ class _GamePageState extends ConsumerState<GamePage> {
               controller.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
             } else if (value.logicalKey == LogicalKeyboardKey.arrowLeft) {
               controller.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
+            } else if (value.logicalKey == LogicalKeyboardKey.enter) {
+              final index = (controller.page!.round() - initialPage) % games.asData!.value.length;
+              ref.read(gameDataListProvider.notifier).execute(index);
             }
           }
         },
