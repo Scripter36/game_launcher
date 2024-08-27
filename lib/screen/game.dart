@@ -108,7 +108,8 @@ class _GamePageState extends ConsumerState<GamePage> {
                       pageCount: data.length,
                       currentPage: page.value,
                       onPageSelected: (index) {
-                        controller.animateToPage(index + initialPage,
+                        final diff = index - page.value;
+                        controller.animateToPage(controller.page!.round() + diff,
                             duration: const Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
                       },
                     ),

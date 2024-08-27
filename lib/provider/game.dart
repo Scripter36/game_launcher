@@ -79,8 +79,8 @@ class GameDataList extends _$GameDataList {
       }
     }).toList());
 
-    // check if the process is still running every 500ms
-    Timer.periodic(const Duration(milliseconds: 500), (timer) async {
+    // check if the process is still running every 1500ms
+    Timer.periodic(const Duration(milliseconds: 1500), (timer) async {
       try {
         Process.run('tasklist', ['/FI', 'PID eq ${process.pid}']).then((result) {
           if (!result.stdout.toString().contains(' ${process.pid} ')) {
