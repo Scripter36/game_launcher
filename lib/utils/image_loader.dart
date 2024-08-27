@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'package:path/path.dart' as p;
 
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -20,7 +21,7 @@ class ImageData with _$ImageData {
 class ImageLoader {
   static Future<ImageData> loadImage(String path) async {
     final dir = Directory.current.path;
-    final file = File('$dir/$path');
+    final file = File(p.join(dir, path));
     final completer = Completer<ImageData>();
     if (!file.existsSync()) {
       completer.completeError('File not found: $path');
@@ -50,5 +51,10 @@ class ImageLoader {
         }),
       );
     return completer.future;
+  }
+
+  static File loadImageFile(String path) {
+    final dir = Directory.current.path;
+    return File(p.join(dir, path));
   }
 }

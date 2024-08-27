@@ -8,7 +8,8 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class GameCard extends HookConsumerWidget {
   final GameData gameData;
-  const GameCard(this.gameData, {Key? key}) : super(key: key);
+  final int index;
+  const GameCard({required this.gameData, required this.index, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -118,17 +119,29 @@ class GameCard extends HookConsumerWidget {
                         ),
                         const SizedBox(height: 16),
                         TextButton(
-                          onPressed: () {},
-                          child: Row(
-                            children: [
-                              PhosphorIcon(PhosphorIcons.play(PhosphorIconsStyle.bold), size: 20),
-                              SizedBox(width: 16, height: 24),
-                              Text('실행하기')
-                            ],
+                          onPressed: () {
+                            if (gameData.isLaunched) {
+                              ref.read(gameDataListProvider.notifier).terminateGame(index);
+                            } else {
+                              ref.read(gameDataListProvider.notifier).launchGame(index);
+                            }
+                          },
+                          child: AnimatedSwitcher(
+                            duration: Durations.medium1,
+                            child: Row(
+                              key: ValueKey(gameData.isLaunched),
+                              children: [
+                                gameData.isLaunched
+                                    ? PhosphorIcon(PhosphorIcons.stop(PhosphorIconsStyle.bold), size: 20)
+                                    : PhosphorIcon(PhosphorIcons.play(PhosphorIconsStyle.bold), size: 20),
+                                SizedBox(width: 16, height: 24),
+                                gameData.isLaunched ? Text('종료하기') : Text('실행하기'),
+                              ],
+                            ),
                           ),
                           style: TextButton.styleFrom(
-                            foregroundColor: const Color(0xFF000000),
-                            backgroundColor: const Color(0x99FFFFFF),
+                            foregroundColor: gameData.isLaunched ? Color(0xFFFFFFFF) : Color(0xFF000000),
+                            backgroundColor: gameData.isLaunched ? Color(0x99DA3737) : Color(0x99FFFFFF),
                             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                             textStyle: const TextStyle(
                               fontFamily: 'Paperlogy',
