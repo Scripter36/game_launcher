@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:game_launcher/provider/game.dart';
 import 'package:game_launcher/utils/image_loader.dart';
 import 'package:game_launcher/utils/text.dart';
+import 'package:game_launcher/widgets/buttons.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:video_player/video_player.dart';
@@ -48,6 +49,8 @@ class GameCard extends HookConsumerWidget {
           videoPlayer.value!.dispose();
         };
       }
+
+      return null;
     }, [gameData.video]);
 
     useEffect(() {
@@ -56,6 +59,8 @@ class GameCard extends HookConsumerWidget {
       } else {
         videoPlayer.value?.pause();
       }
+
+      return null;
     }, [playVideo]);
 
     if (backgroundImage.value == null) {
@@ -142,32 +147,32 @@ class GameCard extends HookConsumerWidget {
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                TextButton(
-                                  onPressed: () {},
-                                  child: Row(
-                                    children: [
-                                      PhosphorIcon(PhosphorIcons.githubLogo(PhosphorIconsStyle.bold), size: 20),
-                                      SizedBox(width: 16),
-                                      Text('코드 보기')
-                                    ],
-                                  ),
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: const Color(0xFFFFFFFF),
-                                    backgroundColor: const Color(0x20FFFFFF),
-                                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                                    textStyle: const TextStyle(
-                                      fontFamily: 'Paperlogy',
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    visualDensity: VisualDensity.standard,
-                                    splashFactory: NoSplash.splashFactory,
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
+                                ...gameData.links
+                                    .map((link) => [
+                                          TextButton(
+                                            onPressed: () {},
+                                            child: Row(
+                                              children: [
+                                                switch (link.type) {
+                                                  'github' => PhosphorIcon(
+                                                      PhosphorIcons.githubLogo(PhosphorIconsStyle.bold),
+                                                      size: 20),
+                                                  'steam' => PhosphorIcon(
+                                                      PhosphorIcons.steamLogo(PhosphorIconsStyle.bold),
+                                                      size: 20),
+                                                  _ =>
+                                                    PhosphorIcon(PhosphorIcons.link(PhosphorIconsStyle.bold), size: 20),
+                                                },
+                                                SizedBox(width: 16),
+                                                Text(link.name),
+                                              ],
+                                            ),
+                                            style: ButtonStyles.secondary,
+                                          ),
+                                          const SizedBox(height: 16),
+                                        ])
+                                    .expand((e) => e)
+                                    .toList(),
                                 TextButton(
                                   onPressed: () {
                                     if (gameData.isLaunched) {
@@ -189,21 +194,7 @@ class GameCard extends HookConsumerWidget {
                                       ],
                                     ),
                                   ),
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: gameData.isLaunched ? Color(0xFFFFFFFF) : Color(0xFF000000),
-                                    backgroundColor: gameData.isLaunched ? Color(0x99DA3737) : Color(0x99FFFFFF),
-                                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                                    textStyle: const TextStyle(
-                                      fontFamily: 'Paperlogy',
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    visualDensity: VisualDensity.standard,
-                                    splashFactory: NoSplash.splashFactory,
-                                  ),
+                                  style: gameData.isLaunched ? ButtonStyles.error : ButtonStyles.primary,
                                 ),
                               ],
                             ),

@@ -10,10 +10,22 @@ part 'game.freezed.dart';
 part 'game.g.dart';
 
 @freezed
+class GameLinkData with _$GameLinkData {
+  const factory GameLinkData({
+    required String name,
+    required String type,
+    required String url,
+  }) = _GameLinkData;
+
+  factory GameLinkData.fromJson(Map<String, Object?> json) => _$GameLinkDataFromJson(json);
+}
+
+@freezed
 class GameData with _$GameData {
   const factory GameData({
     required String name,
     required Map<String, String> metadata,
+    @Default([]) List<GameLinkData> links,
     required String path,
     required String image,
     String? video,
