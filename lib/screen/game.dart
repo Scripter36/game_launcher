@@ -95,7 +95,8 @@ class _GamePageState extends ConsumerState<GamePage> {
                       final game = data[gameIndex];
                       return Padding(
                         padding: const EdgeInsets.all(16),
-                        child: GameCard(gameData: game, index: gameIndex),
+                        child: GameCard(
+                            gameData: game, index: gameIndex, playVideo: gameIndex == page.value && !game.isLaunched),
                       );
                     },
                   ),
