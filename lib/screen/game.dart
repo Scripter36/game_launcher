@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:game_launcher/provider/game.dart';
+import 'package:game_launcher/utils/scroll_behavior.dart';
 import 'package:game_launcher/widgets/game_card.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -43,6 +44,7 @@ class _GamePageState extends ConsumerState<GamePage> {
               data: (data) {
                 return PageView.builder(
                   controller: controller,
+                  scrollBehavior: AppScrollBehavior(),
                   itemBuilder: (context, index) {
                     final game = data[(index - initialPage) % data.length];
                     return Padding(

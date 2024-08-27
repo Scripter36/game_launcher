@@ -16,6 +16,7 @@ class GameData with _$GameData {
     required Map<String, String> metadata,
     required String path,
     required String image,
+    String? video,
     @Default(false) bool isLaunched,
     @Default(false) bool isLaunching,
   }) = _GameData;
