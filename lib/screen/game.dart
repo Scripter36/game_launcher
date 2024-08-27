@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:fullscreen_window/fullscreen_window.dart';
+import 'package:game_launcher/widgets/page_indicator.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:game_launcher/provider/game.dart';
 import 'package:game_launcher/utils/scroll_behavior.dart';
 import 'package:game_launcher/widgets/game_card.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class GamePage extends StatefulHookConsumerWidget {
   const GamePage({super.key});
@@ -96,6 +98,60 @@ class _GamePageState extends ConsumerState<GamePage> {
                         child: GameCard(gameData: game, index: gameIndex),
                       );
                     },
+                  ),
+                  Positioned(
+                    left: 12,
+                    right: 12,
+                    bottom: 24,
+                    child: PageIndicator(
+                      pageCount: data.length,
+                      currentPage: page.value,
+                      onPageSelected: (index) {
+                        controller.animateToPage(index + initialPage,
+                            duration: const Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
+                      },
+                    ),
+                  ),
+                  Positioned(
+                    top: 0,
+                    bottom: 0,
+                    left: 24,
+                    child: Center(
+                      child: IconButton(
+                        onPressed: () {
+                          controller.previousPage(
+                              duration: const Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
+                        },
+                        icon: PhosphorIcon(PhosphorIcons.caretLeft(PhosphorIconsStyle.bold)),
+                        iconSize: 32,
+                        style: IconButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.white.withOpacity(0.1),
+                          padding: const EdgeInsets.all(12),
+                          splashFactory: NoSplash.splashFactory,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 0,
+                    bottom: 0,
+                    right: 24,
+                    child: Center(
+                      child: IconButton(
+                        onPressed: () {
+                          controller.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
+                        },
+                        icon: PhosphorIcon(PhosphorIcons.caretRight(PhosphorIconsStyle.bold)),
+                        iconSize: 32,
+                        style: IconButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.white.withOpacity(0.1),
+                          padding: const EdgeInsets.all(12),
+                          splashFactory: NoSplash.splashFactory,
+                        ),
+                      ),
+                    ),
                   )
                 ],
               );
