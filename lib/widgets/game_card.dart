@@ -89,74 +89,77 @@ class GameCard extends HookConsumerWidget {
                         ],
                       ),
                     ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TextButton(
-                          onPressed: () {},
-                          child: Row(
-                            children: [
-                              PhosphorIcon(PhosphorIcons.githubLogo(PhosphorIconsStyle.bold), size: 20),
-                              SizedBox(width: 16),
-                              Text('코드 보기')
-                            ],
-                          ),
-                          style: TextButton.styleFrom(
-                            foregroundColor: const Color(0xFFFFFFFF),
-                            backgroundColor: const Color(0x20FFFFFF),
-                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                            textStyle: const TextStyle(
-                              fontFamily: 'Paperlogy',
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            visualDensity: VisualDensity.standard,
-                            splashFactory: NoSplash.splashFactory,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        TextButton(
-                          onPressed: () {
-                            if (gameData.isLaunched) {
-                              ref.read(gameDataListProvider.notifier).terminateGame(index);
-                            } else {
-                              ref.read(gameDataListProvider.notifier).launchGame(index);
-                            }
-                          },
-                          child: AnimatedSwitcher(
-                            duration: Durations.medium1,
+                    IntrinsicWidth(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          TextButton(
+                            onPressed: () {},
                             child: Row(
-                              key: ValueKey(gameData.isLaunched),
                               children: [
-                                gameData.isLaunched
-                                    ? PhosphorIcon(PhosphorIcons.stop(PhosphorIconsStyle.bold), size: 20)
-                                    : PhosphorIcon(PhosphorIcons.play(PhosphorIconsStyle.bold), size: 20),
-                                SizedBox(width: 16, height: 24),
-                                gameData.isLaunched ? Text('종료하기') : Text('실행하기'),
+                                PhosphorIcon(PhosphorIcons.githubLogo(PhosphorIconsStyle.bold), size: 20),
+                                SizedBox(width: 16),
+                                Text('코드 보기')
                               ],
                             ),
-                          ),
-                          style: TextButton.styleFrom(
-                            foregroundColor: gameData.isLaunched ? Color(0xFFFFFFFF) : Color(0xFF000000),
-                            backgroundColor: gameData.isLaunched ? Color(0x99DA3737) : Color(0x99FFFFFF),
-                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                            textStyle: const TextStyle(
-                              fontFamily: 'Paperlogy',
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
+                            style: TextButton.styleFrom(
+                              foregroundColor: const Color(0xFFFFFFFF),
+                              backgroundColor: const Color(0x20FFFFFF),
+                              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                              textStyle: const TextStyle(
+                                fontFamily: 'Paperlogy',
+                                fontSize: 20,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              visualDensity: VisualDensity.standard,
+                              splashFactory: NoSplash.splashFactory,
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            visualDensity: VisualDensity.standard,
-                            splashFactory: NoSplash.splashFactory,
                           ),
-                        ),
-                      ],
-                    )
+                          const SizedBox(height: 16),
+                          TextButton(
+                            onPressed: () {
+                              if (gameData.isLaunched) {
+                                ref.read(gameDataListProvider.notifier).terminateGame(index);
+                              } else {
+                                ref.read(gameDataListProvider.notifier).launchGame(index);
+                              }
+                            },
+                            child: AnimatedSwitcher(
+                              duration: Durations.medium1,
+                              child: Row(
+                                key: ValueKey(gameData.isLaunched),
+                                children: [
+                                  gameData.isLaunched
+                                      ? PhosphorIcon(PhosphorIcons.stop(PhosphorIconsStyle.bold), size: 20)
+                                      : PhosphorIcon(PhosphorIcons.play(PhosphorIconsStyle.bold), size: 20),
+                                  SizedBox(width: 16, height: 24),
+                                  gameData.isLaunched ? Text('종료하기') : Text('실행하기'),
+                                ],
+                              ),
+                            ),
+                            style: TextButton.styleFrom(
+                              foregroundColor: gameData.isLaunched ? Color(0xFFFFFFFF) : Color(0xFF000000),
+                              backgroundColor: gameData.isLaunched ? Color(0x99DA3737) : Color(0x99FFFFFF),
+                              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                              textStyle: const TextStyle(
+                                fontFamily: 'Paperlogy',
+                                fontSize: 20,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              visualDensity: VisualDensity.standard,
+                              splashFactory: NoSplash.splashFactory,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),

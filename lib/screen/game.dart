@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:fullscreen_window/fullscreen_window.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:flutter/material.dart';
@@ -23,10 +24,11 @@ class _GamePageState extends ConsumerState<GamePage> {
 
     // simple hack to make the page view infinite in both directions
     const int initialPage = 1073741823;
-    final PageController controller = usePageController(viewportFraction: 0.9, initialPage: initialPage);
-    final FocusNode focusNode = useFocusNode();
+    final PageController controller = usePageController(viewportFraction: 0.95, initialPage: initialPage);
+    final FocusNode focusNode = useFocusNode(descendantsAreFocusable: false);
 
     final page = useState(0);
+    final isFullScreen = useState(false);
 
     // listen to page change
     useEffect(() {
@@ -41,64 +43,68 @@ class _GamePageState extends ConsumerState<GamePage> {
     }, [games]);
 
     return KeyboardListener(
-        focusNode: focusNode,
-        autofocus: true,
-        onKeyEvent: (value) {
-          if (value is KeyDownEvent) {
-            if (value.logicalKey == LogicalKeyboardKey.arrowRight) {
-              controller.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
-            } else if (value.logicalKey == LogicalKeyboardKey.arrowLeft) {
-              controller.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
-            } else if (value.logicalKey == LogicalKeyboardKey.enter) {
-              final index = (controller.page!.round() - initialPage) % games.asData!.value.length;
-              ref.read(gameDataListProvider.notifier).launchGame(index);
-            }
+      focusNode: focusNode,
+      autofocus: true,
+      onKeyEvent: (value) {
+        if (value is KeyDownEvent) {
+          if (value.logicalKey == LogicalKeyboardKey.arrowRight) {
+            controller.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
+          } else if (value.logicalKey == LogicalKeyboardKey.arrowLeft) {
+            controller.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
+          } else if (value.logicalKey == LogicalKeyboardKey.enter) {
+            final index = (controller.page!.round() - initialPage) % games.asData!.value.length;
+            ref.read(gameDataListProvider.notifier).launchGame(index);
+          } else if (value.logicalKey == LogicalKeyboardKey.f11) {
+            isFullScreen.value = !isFullScreen.value;
+            FullScreenWindow.setFullScreen(isFullScreen.value);
           }
-        },
-        child: Scaffold(
-          body: Center(
-            child: games.when(
-              data: (data) {
-                return Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Container(
-                      color: Colors.black,
-                    ),
-                    AnimatedSwitcher(
-                      duration: Durations.medium1,
-                      child: Container(
-                        key: ValueKey(data[page.value].image),
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: FileImage(File(p.join(Directory.current.path, data[page.value].image))),
-                          ),
+        }
+      },
+      child: Scaffold(
+        body: Center(
+          child: games.when(
+            data: (data) {
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  Container(
+                    color: Colors.black,
+                  ),
+                  AnimatedSwitcher(
+                    duration: Durations.medium1,
+                    child: Container(
+                      key: ValueKey(data[page.value].image),
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: FileImage(File(p.join(Directory.current.path, data[page.value].image))),
                         ),
                       ),
                     ),
-                    Container(
-                      color: Color(0xFF323232).withOpacity(0.5),
-                    ),
-                    PageView.builder(
-                      controller: controller,
-                      scrollBehavior: AppScrollBehavior(),
-                      itemBuilder: (context, index) {
-                        final gameIndex = (index - initialPage) % data.length;
-                        final game = data[gameIndex];
-                        return Padding(
-                          padding: const EdgeInsets.all(32),
-                          child: GameCard(gameData: game, index: gameIndex),
-                        );
-                      },
-                    )
-                  ],
-                );
-              },
-              loading: () => const CircularProgressIndicator(),
-              error: (error, stack) => Text('Error: $error'),
-            ),
+                  ),
+                  Container(
+                    color: Color(0xFF323232).withOpacity(0.5),
+                  ),
+                  PageView.builder(
+                    controller: controller,
+                    scrollBehavior: AppScrollBehavior(),
+                    itemBuilder: (context, index) {
+                      final gameIndex = (index - initialPage) % data.length;
+                      final game = data[gameIndex];
+                      return Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: GameCard(gameData: game, index: gameIndex),
+                      );
+                    },
+                  )
+                ],
+              );
+            },
+            loading: () => const CircularProgressIndicator(),
+            error: (error, stack) => Text('Error: $error'),
           ),
-        ));
+        ),
+      ),
+    );
   }
 }
