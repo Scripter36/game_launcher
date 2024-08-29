@@ -37,8 +37,8 @@ class GameCard extends HookConsumerWidget {
           if (videoPlayer.value == null) {
             return;
           }
+          videoPlayer.value!.setLooping(true);
           if (playVideo) {
-            videoPlayer.value!.setLooping(true);
             videoPlayer.value!.play();
           } else {
             videoPlayer.value!.pause();
@@ -66,144 +66,138 @@ class GameCard extends HookConsumerWidget {
     if (backgroundImage.value == null) {
       return Container();
     } else {
-      return Focus(
-        descendantsAreFocusable: false,
-        canRequestFocus: false,
-        child: Center(
-          child: AspectRatio(
-            aspectRatio: aspectRatio.value,
-            child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.5),
-                      spreadRadius: 0,
-                      blurRadius: 16,
-                      offset: const Offset(0, 0),
-                    ),
-                  ],
+      return Center(
+        child: AspectRatio(
+          aspectRatio: aspectRatio.value,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.5),
+                  spreadRadius: 0,
+                  blurRadius: 16,
+                  offset: const Offset(0, 0),
                 ),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    if (videoPlayer.value != null)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(24),
-                        child: VideoPlayer(videoPlayer.value!),
-                      )
-                    else
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(24),
-                          image: DecorationImage(
-                            image: backgroundImage.value!.image,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    Container(
-                      padding: const EdgeInsets.all(64),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(24),
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.black.withOpacity(0.0),
-                            Colors.black.withOpacity(0.4),
-                            Colors.black.withOpacity(0.5),
-                          ],
-                          stops: const [0.0, 0.3, 1.0],
-                        ),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  gameData.name,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 52,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                ...gameData.metadata.entries
-                                    .map((entry) =>
-                                        [const SizedBox(height: 12), GameMetaDataItem(entry.key, entry.value)])
-                                    .expand((element) => element)
-                                    .toList(),
-                              ],
-                            ),
-                          ),
-                          IntrinsicWidth(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                ...gameData.links
-                                    .map((link) => [
-                                          TextButton(
-                                            onPressed: () {},
-                                            child: Row(
-                                              children: [
-                                                switch (link.type) {
-                                                  'github' => PhosphorIcon(
-                                                      PhosphorIcons.githubLogo(PhosphorIconsStyle.bold),
-                                                      size: 20),
-                                                  'steam' => PhosphorIcon(
-                                                      PhosphorIcons.steamLogo(PhosphorIconsStyle.bold),
-                                                      size: 20),
-                                                  _ =>
-                                                    PhosphorIcon(PhosphorIcons.link(PhosphorIconsStyle.bold), size: 20),
-                                                },
-                                                SizedBox(width: 16),
-                                                Text(link.name),
-                                              ],
-                                            ),
-                                            style: ButtonStyles.secondary,
-                                          ),
-                                          const SizedBox(height: 16),
-                                        ])
-                                    .expand((e) => e)
-                                    .toList(),
-                                TextButton(
-                                  onPressed: () {
-                                    if (gameData.isLaunched) {
-                                      ref.read(gameDataListProvider.notifier).terminateGame(index);
-                                    } else {
-                                      ref.read(gameDataListProvider.notifier).launchGame(index);
-                                    }
-                                  },
-                                  child: AnimatedSwitcher(
-                                    duration: Durations.medium1,
-                                    child: Row(
-                                      key: ValueKey(gameData.isLaunched),
-                                      children: [
-                                        gameData.isLaunched
-                                            ? PhosphorIcon(PhosphorIcons.stop(PhosphorIconsStyle.bold), size: 20)
-                                            : PhosphorIcon(PhosphorIcons.play(PhosphorIconsStyle.bold), size: 20),
-                                        SizedBox(width: 16, height: 24),
-                                        gameData.isLaunched ? Text('종료하기') : Text('실행하기'),
-                                      ],
-                                    ),
-                                  ),
-                                  style: gameData.isLaunched ? ButtonStyles.error : ButtonStyles.primary,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+              ],
+            ),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                if (videoPlayer.value != null)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: VideoPlayer(videoPlayer.value!),
+                  )
+                else
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      image: DecorationImage(
+                        image: backgroundImage.value!.image,
+                        fit: BoxFit.cover,
                       ),
                     ),
-                  ],
-                )),
+                  ),
+                Container(
+                  padding: const EdgeInsets.all(64),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(24),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withOpacity(0.0),
+                        Colors.black.withOpacity(0.4),
+                        Colors.black.withOpacity(0.5),
+                      ],
+                      stops: const [0.0, 0.3, 1.0],
+                    ),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              gameData.name,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 52,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            ...gameData.metadata.entries
+                                .map((entry) => [const SizedBox(height: 12), GameMetaDataItem(entry.key, entry.value)])
+                                .expand((element) => element)
+                                .toList(),
+                          ],
+                        ),
+                      ),
+                      IntrinsicWidth(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            ...gameData.links
+                                .map((link) => [
+                                      TextButton(
+                                        onPressed: () {},
+                                        child: Row(
+                                          children: [
+                                            switch (link.type) {
+                                              'github' => PhosphorIcon(
+                                                  PhosphorIcons.githubLogo(PhosphorIconsStyle.bold),
+                                                  size: 20),
+                                              'steam' => PhosphorIcon(PhosphorIcons.steamLogo(PhosphorIconsStyle.bold),
+                                                  size: 20),
+                                              _ => PhosphorIcon(PhosphorIcons.link(PhosphorIconsStyle.bold), size: 20),
+                                            },
+                                            SizedBox(width: 16),
+                                            Text(link.name),
+                                          ],
+                                        ),
+                                        style: ButtonStyles.secondary,
+                                      ),
+                                      const SizedBox(height: 16),
+                                    ])
+                                .expand((e) => e)
+                                .toList(),
+                            TextButton(
+                              onPressed: () {
+                                if (gameData.isLaunched) {
+                                  ref.read(gameDataListProvider.notifier).terminateGame(index);
+                                } else {
+                                  ref.read(gameDataListProvider.notifier).launchGame(index);
+                                }
+                              },
+                              child: AnimatedSwitcher(
+                                duration: Durations.medium1,
+                                child: Row(
+                                  key: ValueKey(gameData.isLaunched),
+                                  children: [
+                                    gameData.isLaunched
+                                        ? PhosphorIcon(PhosphorIcons.stop(PhosphorIconsStyle.bold), size: 20)
+                                        : PhosphorIcon(PhosphorIcons.play(PhosphorIconsStyle.bold), size: 20),
+                                    SizedBox(width: 16, height: 24),
+                                    gameData.isLaunched ? Text('종료하기') : Text('실행하기'),
+                                  ],
+                                ),
+                              ),
+                              style: gameData.isLaunched ? ButtonStyles.error : ButtonStyles.primary,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );

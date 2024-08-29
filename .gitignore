@@ -44,6 +44,7 @@ app.*.map.json
 
 # data files
 data/
+assets/images/icon.png
 
 # generated files
 *.freezed.dart
