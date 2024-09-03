@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:fullscreen_window/fullscreen_window.dart';
+import 'package:game_launcher/widgets/autoplay_indicator.dart';
 import 'package:game_launcher/widgets/page_indicator.dart';
 import 'package:path/path.dart' as p;
 
@@ -32,6 +34,19 @@ class _GamePageState extends ConsumerState<GamePage> {
     final page = useState(0);
     final isFullScreen = useState(false);
     final isPlayingAnyGame = games.asData?.value.any((game) => game.isLaunched) ?? false;
+    final isAutoPlay = useState(true);
+    final isMouseMoving = useState(false);
+    final mouseMovingTimer = useState<Timer?>(null);
+
+    // auto play
+    useEffect(() {
+      if (isAutoPlay.value && !isPlayingAnyGame && !isMouseMoving.value) {
+        final timer = Timer.periodic(const Duration(seconds: 10), (timer) {
+          controller.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
+        });
+        return timer.cancel;
+      }
+    }, [isAutoPlay.value, isPlayingAnyGame, isMouseMoving.value]);
 
     // listen to page change
     useEffect(() {
@@ -45,122 +60,150 @@ class _GamePageState extends ConsumerState<GamePage> {
       };
     }, [games]);
 
-    return KeyboardListener(
-      focusNode: focusNode,
-      autofocus: true,
-      onKeyEvent: (value) {
-        if (value is KeyDownEvent) {
-          if (value.logicalKey == LogicalKeyboardKey.arrowRight) {
-            controller.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
-          } else if (value.logicalKey == LogicalKeyboardKey.arrowLeft) {
-            controller.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
-          } else if (value.logicalKey == LogicalKeyboardKey.enter) {
-            final index = (controller.page!.round() - initialPage) % games.asData!.value.length;
-            ref.read(gameDataListProvider.notifier).launchGame(index);
-          } else if (value.logicalKey == LogicalKeyboardKey.f11) {
-            isFullScreen.value = !isFullScreen.value;
-            FullScreenWindow.setFullScreen(isFullScreen.value);
-          }
-        }
+    return Listener(
+      behavior: HitTestBehavior.opaque,
+      onPointerHover: (event) {
+        // disable auto play for 30s
+        isMouseMoving.value = true;
+        mouseMovingTimer.value?.cancel();
+        mouseMovingTimer.value = Timer(const Duration(seconds: 30), () {
+          isMouseMoving.value = false;
+        });
       },
-      child: Scaffold(
-        body: Center(
-          child: games.when(
-            data: (data) {
-              return Stack(
-                fit: StackFit.expand,
-                children: [
-                  Container(
-                    color: Colors.black,
-                  ),
-                  AnimatedSwitcher(
-                    duration: Durations.medium1,
-                    child: Container(
-                      key: ValueKey(data[page.value].image),
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          fit: BoxFit.cover,
-                          image: FileImage(File(p.join(Directory.current.path, data[page.value].image))),
+      onPointerMove: (event) {
+        // disable auto play for 30s
+        isMouseMoving.value = true;
+        mouseMovingTimer.value?.cancel();
+        mouseMovingTimer.value = Timer(const Duration(seconds: 30), () {
+          isMouseMoving.value = false;
+        });
+      },
+      child: KeyboardListener(
+        focusNode: focusNode,
+        autofocus: true,
+        onKeyEvent: (value) {
+          if (value is KeyDownEvent) {
+            if (value.logicalKey == LogicalKeyboardKey.arrowRight) {
+              controller.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
+            } else if (value.logicalKey == LogicalKeyboardKey.arrowLeft) {
+              controller.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
+            } else if (value.logicalKey == LogicalKeyboardKey.enter) {
+              final index = (controller.page!.round() - initialPage) % games.asData!.value.length;
+              ref.read(gameDataListProvider.notifier).launchGame(index);
+            } else if (value.logicalKey == LogicalKeyboardKey.f11) {
+              isFullScreen.value = !isFullScreen.value;
+              FullScreenWindow.setFullScreen(isFullScreen.value);
+            }
+          }
+        },
+        child: Scaffold(
+          body: Center(
+            child: games.when(
+              data: (data) {
+                return Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Container(
+                      color: Colors.black,
+                    ),
+                    AnimatedSwitcher(
+                      duration: Durations.medium1,
+                      child: Container(
+                        key: ValueKey(data[page.value].image),
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            fit: BoxFit.cover,
+                            image: FileImage(File(p.join(Directory.current.path, data[page.value].image))),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Container(
-                    color: Color(0xFF323232).withOpacity(0.5),
-                  ),
-                  PageView.builder(
-                    controller: controller,
-                    scrollBehavior: AppScrollBehavior(),
-                    itemBuilder: (context, index) {
-                      final gameIndex = (index - initialPage) % data.length;
-                      final game = data[gameIndex];
-                      return Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: GameCard(
-                            gameData: game, index: gameIndex, playVideo: gameIndex == page.value && !isPlayingAnyGame),
-                      );
-                    },
-                  ),
-                  Positioned(
-                    left: 12,
-                    right: 12,
-                    bottom: 24,
-                    child: PageIndicator(
-                      pageCount: data.length,
-                      currentPage: page.value,
-                      onPageSelected: (index) {
-                        final diff = index - page.value;
-                        controller.animateToPage(controller.page!.round() + diff,
-                            duration: const Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
+                    Container(
+                      color: Color(0xFF323232).withOpacity(0.5),
+                    ),
+                    PageView.builder(
+                      controller: controller,
+                      scrollBehavior: AppScrollBehavior(),
+                      itemBuilder: (context, index) {
+                        final gameIndex = (index - initialPage) % data.length;
+                        final game = data[gameIndex];
+                        return Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: GameCard(
+                              gameData: game,
+                              index: gameIndex,
+                              playVideo: gameIndex == page.value && !isPlayingAnyGame),
+                        );
                       },
                     ),
-                  ),
-                  Positioned(
-                    top: 0,
-                    bottom: 0,
-                    left: 24,
-                    child: Center(
-                      child: IconButton(
-                        onPressed: () {
-                          controller.previousPage(
+                    Positioned(
+                      left: 12,
+                      right: 12,
+                      bottom: 24,
+                      child: PageIndicator(
+                        pageCount: data.length,
+                        currentPage: page.value,
+                        onPageSelected: (index) {
+                          final diff = index - page.value;
+                          controller.animateToPage(controller.page!.round() + diff,
                               duration: const Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
                         },
-                        icon: PhosphorIcon(PhosphorIcons.caretLeft(PhosphorIconsStyle.bold)),
-                        iconSize: 32,
-                        style: IconButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: Colors.white.withOpacity(0.1),
-                          padding: const EdgeInsets.all(12),
-                          splashFactory: NoSplash.splashFactory,
+                      ),
+                    ),
+                    Positioned(
+                      top: 0,
+                      bottom: 0,
+                      left: 24,
+                      child: Center(
+                        child: IconButton(
+                          onPressed: () {
+                            controller.previousPage(
+                                duration: const Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
+                          },
+                          icon: PhosphorIcon(PhosphorIcons.caretLeft(PhosphorIconsStyle.bold)),
+                          iconSize: 32,
+                          style: IconButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.white.withOpacity(0.1),
+                            padding: const EdgeInsets.all(12),
+                            splashFactory: NoSplash.splashFactory,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    top: 0,
-                    bottom: 0,
-                    right: 24,
-                    child: Center(
-                      child: IconButton(
-                        onPressed: () {
-                          controller.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
-                        },
-                        icon: PhosphorIcon(PhosphorIcons.caretRight(PhosphorIconsStyle.bold)),
-                        iconSize: 32,
-                        style: IconButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: Colors.white.withOpacity(0.1),
-                          padding: const EdgeInsets.all(12),
-                          splashFactory: NoSplash.splashFactory,
+                    Positioned(
+                      top: 0,
+                      bottom: 0,
+                      right: 24,
+                      child: Center(
+                        child: IconButton(
+                          onPressed: () {
+                            controller.nextPage(
+                                duration: const Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
+                          },
+                          icon: PhosphorIcon(PhosphorIcons.caretRight(PhosphorIconsStyle.bold)),
+                          iconSize: 32,
+                          style: IconButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.white.withOpacity(0.1),
+                            padding: const EdgeInsets.all(12),
+                            splashFactory: NoSplash.splashFactory,
+                          ),
                         ),
                       ),
                     ),
-                  )
-                ],
-              );
-            },
-            loading: () => const CircularProgressIndicator(),
-            error: (error, stack) => Text('Error: $error'),
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child:
+                          AutoplayIndicator(value: isAutoPlay.value, onChanged: (value) => isAutoPlay.value = value!),
+                    )
+                  ],
+                );
+              },
+              loading: () => const CircularProgressIndicator(),
+              error: (error, stack) => Text('Error: $error'),
+            ),
           ),
         ),
       ),
