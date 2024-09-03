@@ -21,7 +21,11 @@ class ImageData with _$ImageData {
 class ImageLoader {
   static Future<ImageData> loadImage(String path) async {
     final dir = Directory.current.path;
-    final file = File(p.join(dir, path));
+    // if path is not absolute, join it with the current directory
+    if (!p.isAbsolute(path)) {
+      path = p.join(dir, path);
+    }
+    final file = File(path);
     final completer = Completer<ImageData>();
     if (!file.existsSync()) {
       completer.completeError('File not found: $path');
@@ -55,6 +59,9 @@ class ImageLoader {
 
   static File loadImageFile(String path) {
     final dir = Directory.current.path;
-    return File(p.join(dir, path));
+    if (!p.isAbsolute(path)) {
+      path = p.join(dir, path);
+    }
+    return File(path);
   }
 }

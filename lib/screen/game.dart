@@ -31,6 +31,7 @@ class _GamePageState extends ConsumerState<GamePage> {
 
     final page = useState(0);
     final isFullScreen = useState(false);
+    final isPlayingAnyGame = games.asData?.value.any((game) => game.isLaunched) ?? false;
 
     // listen to page change
     useEffect(() {
@@ -96,7 +97,7 @@ class _GamePageState extends ConsumerState<GamePage> {
                       return Padding(
                         padding: const EdgeInsets.all(16),
                         child: GameCard(
-                            gameData: game, index: gameIndex, playVideo: gameIndex == page.value && !game.isLaunched),
+                            gameData: game, index: gameIndex, playVideo: gameIndex == page.value && !isPlayingAnyGame),
                       );
                     },
                   ),

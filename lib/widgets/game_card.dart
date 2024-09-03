@@ -168,11 +168,12 @@ class GameCard extends HookConsumerWidget {
                                 .expand((e) => e)
                                 .toList(),
                             TextButton(
-                              onPressed: () {
+                              onPressed: () async {
                                 if (gameData.isLaunched) {
-                                  ref.read(gameDataListProvider.notifier).terminateGame(index);
+                                  await ref.read(gameDataListProvider.notifier).terminateGame(index);
                                 } else {
-                                  ref.read(gameDataListProvider.notifier).launchGame(index);
+                                  await ref.read(gameDataListProvider.notifier).terminateAllGames();
+                                  await ref.read(gameDataListProvider.notifier).launchGame(index);
                                 }
                               },
                               child: AnimatedSwitcher(

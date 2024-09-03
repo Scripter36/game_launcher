@@ -56,23 +56,17 @@ class GameDataList extends _$GameDataList {
     if (game.isLaunched) {
       return false;
     }
-
-    state = AsyncData(previousState.map((e) {
-      if (e == game) {
-        return e.copyWith(isLaunched: false);
-      } else {
-        return e;
-      }
-    }).toList());
     final completer = Completer<bool>();
 
     final dir = Directory.current.path;
 
     final process = await Process.start(p.join(dir, game.path), [], mode: ProcessStartMode.detached);
+    // print pid
+    print('Game ${game.name} started with pid ${process.pid}');
 
     // wait until the process is finished
     state = AsyncData(previousState.map((e) {
-      if (e == game) {
+      if (e.name == game.name) {
         return e.copyWith(isLaunched: true, pid: process.pid);
       } else {
         return e;
@@ -82,10 +76,11 @@ class GameDataList extends _$GameDataList {
     // check if the process is still running every 1500ms
     Timer.periodic(const Duration(milliseconds: 1500), (timer) async {
       try {
-        Process.run('tasklist', ['/FI', 'PID eq ${process.pid}']).then((result) {
+        Process.run('tasklist', ['/FI', 'PID eq ${process.pid}']).then((result) async {
           if (!result.stdout.toString().contains(' ${process.pid} ')) {
-            state = AsyncData(previousState.map((e) {
-              if (e == game) {
+            print('Game ${game.name} terminated with pid ${process.pid}');
+            state = AsyncData((await future).map((e) {
+              if (e.name == game.name) {
                 return e.copyWith(isLaunched: false, pid: 0);
               } else {
                 return e;
@@ -96,10 +91,13 @@ class GameDataList extends _$GameDataList {
               // cancel the timer
               timer.cancel();
             }
+          } else {
+            print('Game ${game.name} is still running with pid ${process.pid}');
           }
         });
       } catch (e) {
         // ignore
+        print('Error: $e');
       }
     });
 
@@ -115,5 +113,14 @@ class GameDataList extends _$GameDataList {
 
     await Process.killPid(game.pid);
     return true;
+  }
+
+  Future<void> terminateAllGames() async {
+    final previousState = await future;
+    for (final game in previousState) {
+      if (game.isLaunched) {
+        await Process.killPid(game.pid);
+      }
+    }
   }
 }
