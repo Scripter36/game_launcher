@@ -74,7 +74,7 @@ class GameCard extends HookConsumerWidget {
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withValues(alpha: 0.5),
                   spreadRadius: 0,
                   blurRadius: 16,
                   offset: const Offset(0, 0),
@@ -107,9 +107,9 @@ class GameCard extends HookConsumerWidget {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withOpacity(0.0),
-                        Colors.black.withOpacity(0.4),
-                        Colors.black.withOpacity(0.5),
+                        Colors.black.withValues(alpha: 0.0),
+                        Colors.black.withValues(alpha: 0.4),
+                        Colors.black.withValues(alpha: 0.5),
                       ],
                       stops: const [0.0, 0.3, 1.0],
                     ),

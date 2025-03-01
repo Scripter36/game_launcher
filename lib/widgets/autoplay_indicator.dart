@@ -15,7 +15,7 @@ class AutoplayIndicator extends HookWidget {
       splashFactory: InkRipple.splashFactory,
       borderRadius: BorderRadius.circular(8),
       child: Ink(
-        color: Colors.black.withOpacity(0.6),
+        color: Colors.black.withValues(alpha: 0.6),
         padding: const EdgeInsets.all(16),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -23,9 +23,9 @@ class AutoplayIndicator extends HookWidget {
           children: [
             Container(
               width: 16,
-              height: 16,
+              height: 16, 
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.6),
+                color: Colors.white.withValues(alpha: 0.6),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: AnimatedSwitcher(

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -10,18 +11,19 @@ part 'game.freezed.dart';
 part 'game.g.dart';
 
 @freezed
-class GameLinkData with _$GameLinkData {
+sealed class GameLinkData with _$GameLinkData {
   const factory GameLinkData({
     required String name,
     required String type,
     required String url,
   }) = _GameLinkData;
+  const GameLinkData._();
 
   factory GameLinkData.fromJson(Map<String, Object?> json) => _$GameLinkDataFromJson(json);
 }
 
 @freezed
-class GameData with _$GameData {
+sealed class GameData with _$GameData {
   const factory GameData({
     required String name,
     required Map<String, String> metadata,
@@ -32,15 +34,20 @@ class GameData with _$GameData {
     @Default(false) bool isLaunched,
     @Default(0) int pid,
   }) = _GameData;
-
+  const GameData._();
   factory GameData.fromJson(Map<String, Object?> json) => _$GameDataFromJson(json);
 }
 
 @riverpod
 class GameDataList extends _$GameDataList {
+  String _getDirectoryPath() {
+    // TODO: better way to handle game path
+    return Directory.current.path;
+  }
+
   @override
   Future<List<GameData>> build() async {
-    final dir = Directory.current.path;
+    final dir = _getDirectoryPath();
     final file = File(p.join(dir, 'data/games.json'));
     if (!file.existsSync()) {
       return [];
@@ -58,7 +65,7 @@ class GameDataList extends _$GameDataList {
     }
     final completer = Completer<bool>();
 
-    final dir = Directory.current.path;
+    final dir = _getDirectoryPath();
 
     final process = await Process.start(p.join(dir, game.path), [], mode: ProcessStartMode.detached);
     // print pid

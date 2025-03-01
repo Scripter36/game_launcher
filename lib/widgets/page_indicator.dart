@@ -31,7 +31,7 @@ class PageIndicator extends StatelessWidget {
                 width: isCurrent ? 12 : 8,
                 height: isCurrent ? 12 : 8,
                 decoration: BoxDecoration(
-                  color: isCurrent ? Colors.white.withOpacity(0.6) : Colors.black.withOpacity(0.6),
+                  color: isCurrent ? Colors.white.withValues(alpha: 0.6) : Colors.black.withValues(alpha: 0.6),
                   shape: BoxShape.circle,
                 ),
               ),

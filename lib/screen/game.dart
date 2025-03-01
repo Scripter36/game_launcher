@@ -46,6 +46,7 @@ class _GamePageState extends ConsumerState<GamePage> {
         });
         return timer.cancel;
       }
+      return null;
     }, [isAutoPlay.value, isPlayingAnyGame, isMouseMoving.value]);
 
     // listen to page change
@@ -119,7 +120,7 @@ class _GamePageState extends ConsumerState<GamePage> {
                       ),
                     ),
                     Container(
-                      color: Color(0xFF323232).withOpacity(0.5),
+                      color: Color(0xFF323232).withValues(alpha: 0.5),
                     ),
                     PageView.builder(
                       controller: controller,
@@ -164,7 +165,7 @@ class _GamePageState extends ConsumerState<GamePage> {
                           iconSize: 32,
                           style: IconButton.styleFrom(
                             foregroundColor: Colors.white,
-                            backgroundColor: Colors.white.withOpacity(0.1),
+                            backgroundColor: Colors.white.withValues(alpha: 0.1),
                             padding: const EdgeInsets.all(12),
                             splashFactory: NoSplash.splashFactory,
                           ),
@@ -185,7 +186,7 @@ class _GamePageState extends ConsumerState<GamePage> {
                           iconSize: 32,
                           style: IconButton.styleFrom(
                             foregroundColor: Colors.white,
-                            backgroundColor: Colors.white.withOpacity(0.1),
+                            backgroundColor: Colors.white.withValues(alpha: 0.1),
                             padding: const EdgeInsets.all(12),
                             splashFactory: NoSplash.splashFactory,
                           ),

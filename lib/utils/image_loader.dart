@@ -11,11 +11,15 @@ part 'image_loader.freezed.dart';
 
 @freezed
 class ImageData with _$ImageData {
-  const factory ImageData({
-    required Image image,
-    required int width,
-    required int height,
-  }) = _ImageData;
+  final Image image;
+  final int width;
+  final int height;
+
+  const ImageData({
+    required this.image,
+    required this.width,
+    required this.height,
+  });
 }
 
 class ImageLoader {
